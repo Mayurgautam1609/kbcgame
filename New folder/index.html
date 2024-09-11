@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaun Banega Crorepati</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #question { font-size: 1.5em; margin: 20px; }
+        .option { display: block; margin: 10px 0; }
+        #timer { font-size: 1.2em; color: red; }
+        #prize { font-size: 1.2em; margin-top: 20px; }
+        #s{display: none;margin-left: 800px;margin-top: 350px}
+        #h{font-size: 22px;font-weight: bold;top: 100px}
+    </style>
+    <audio id="play"><source src="kbcsongs.mp3"></audio>
+    <audio id="answer"><source src="correct.mp3"></audio>
+
+    <script>
+        function gamestart()
+        {
+            //startGame()
+            document.getElementById('start').style.display='block';
+            document.getElementById('start').style.color='white';
+            document.getElementById('song').style.display='none'
+            document.getElementById('play').play()
+            startGame()
+        }
+    </script>
+
+</head>
+<body background="kbc3.jpg" style="background-size:cover;">
+
+    <div>
+        <button id="song" onclick="gamestart()">start game</button>
+    </div>
+    <div style="display: none;" id="start">
+
+    <div id="question"></div>
+    <div id="options">
+        <button class="option" onclick="submitAnswer('a')">Option A</button>
+        <button class="option" onclick="submitAnswer('b')">Option B</button>
+        <button class="option" onclick="submitAnswer('c')">Option C</button>
+    </div>
+    <div id="timer">Time Left: <span id="time">30</span> seconds</div>
+    <div id="prize">Prize: <span id="prizeAmount">0</span></div>
+
+    </div>
+    <div id="s" style="height: 200px;width: 200px;background-color: white;">
+        <h1 id="h" style="font-size: 22px;"></h1>
+        
+    </div>
+    <script>
+
+let questions = [
+    {
+        question: "What does CSS stands for?",
+        options: {a:"Computing Style Sheet", b:"Cascading Style Sheet", c: "Creative Style Sheet", d:"Creative Styling Sheet"},
+        correctAnswer: "b",
+        prize:1000
+    },
+    {
+        question: "What does HTML stand for?",
+        options: {a:"Hyper Text Preprocessor",b: "Hyper Text Markup Language",c: "Hyper Text Multiple Language",d: "Hyper Tool Multi Language"},
+        correctAnswer: "b",
+        prize:2000
+    },
+    {
+        question: "How to print a page using Javascript?",
+        options:  {a:"window.print()",b: "browser.print()",c: "navigator.print()",d: "document.print()"},
+        correctAnswer: "a",
+        prize:3000
+    },
+    {
+        question: "Which language runs on a web browser?",
+         options: {a:"Java",b: "C++",c: "Python",d: "Javascript"},
+        correctAnswer: "c",
+        prize:4000
+    },
+    {
+        question: " How do you declare a javascript variable ?",
+        options: {a:"variable carName;",b: "var carName;",c: "v carName;",d: "none of this"},
+        correctAnswer: "b",
+        prize:5000
+    },
+    {
+        question: "How do you called a function named 'myFunction'?",
+        options: {a:"call myFunction()",b: "myFunction()",c: "call function()",d:" myFunction()"},
+        correctAnswer: "b",
+        prize:6000
+    },
+    {
+        question: 'How do you write "Hello World" in an alert box?',
+        options: {a:'alert("Hello World")',b: 'alertBox("helloWorld")',c: 'msg("Hello World")',d: 'msgBox("Hello World")'},
+        correctAnswer: 'a',
+        prize:7000
+    },
+    {
+        question: "What is the most used programming language in 2021?",
+        options: {a:"Java",b: "C",c: "Python",d: "Javascript"},
+        correctAnswer: "d",
+        prize:8000
+    },
+    {
+        question: "When JS develope?",
+        options: {a:"1990",b: "1995",c: "1999",d: "1892"},
+        correctAnswer: "b",
+        prize:9000
+    },
+    {
+        question: "Which of the following is not Css Box model property?",
+        options: {a:"margin",b: "padding",c: "border-radius",d: "border-collapse"},
+        correctAnswer: "border-collapse",
+        prize:10000
+    },
+    {
+        question: " Find the missing terms in multiple of 3: 3, 6, 9, __, 15",
+        options: {a:"10",b: "11",c: "12",d: "13"},
+        correctAnswer: "c",
+        prize:11000
+    },
+    {
+        question: " Solve 24÷8+2.",
+        options: {a:"5",b: "6",c: "8",d:"12"},
+        correctAnswer: "b",
+        prize:12000
+    },
+    {
+        question: "Solve: 300 – (150×2)",
+        options: {a:'150',b: '100',c: '50',d: '0'},
+        correctAnswer: "d",
+        prize:13000
+    },
+    {
+        question: "The product of 121 x 0 x 200 x 25 is",
+        options: {a:"1500",b: "00",c: "4000",d: "5000"},
+        correctAnswer: "b",
+        prize:14000
+    },
+    {
+        question: "When JS develope?",
+        options: {a:"1990",b: "1995",c: "1999",d: "1892"},
+        correctAnswer: "b",
+        prize:15000
+    },
+        
+];
+
+let currentQuestionIndex = 0;
+let timer;
+let timeLeft;
+var prizeAmount = 0;
+var totalscore=0;
+
+function startGame() {
+    displayQuestion();
+    startTimer(timeLimit);
+}
+
+function displayQuestion() {
+    let question = questions[currentQuestionIndex];
+    document.getElementById('question').innerText = question.question;
+    let options = question.options;
+    document.querySelector('.option:nth-child(1)').innerText = 'A: ' + options.a;
+    document.querySelector('.option:nth-child(2)').innerText = 'B: ' + options.b;
+    document.querySelector('.option:nth-child(3)').innerText = 'C: ' + options.c;
+     let timeLimit;
+    if (currentQuestionIndex < 5) {
+        timeLimit = 30; 
+    } else if (currentQuestionIndex < 10) {
+        timeLimit = 45; 
+    } else {
+        timeLimit = 60; 
+    }
+    startTimer(timeLimit)
+}
+
+function startTimer(seconds){
+    // timeLeft = 30;
+    timeLeft = seconds
+    document.getElementById('time').innerText = timeLeft;
+    timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById('time').innerText = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            alert("Time's up! The correct answer was " + questions[currentQuestionIndex].correctAnswer);
+            // Move to the next question or end game
+            nextQuestion();
+        }
+    }, 1000);
+}
+
+function submitAnswer(answer) {
+    clearInterval(timer);
+    var totalscore=prizeAmount;
+    let correctAnswer = questions[currentQuestionIndex].correctAnswer;
+    if (answer === correctAnswer) {
+        prizeAmount = questions[currentQuestionIndex].prize;
+        document.getElementById('answer').play()
+        document.getElementById('prizeAmount').innerText = prizeAmount;
+        alert("Correct answer! You've won " + prizeAmount);
+        nextQuestion();
+    }
+    else
+    {
+        prizeAmount = questions[currentQuestionIndex].prize;
+        document.getElementById('prizeAmount').innerText = prizeAmount;
+        document.getElementById("start").innerText="";
+        document.getElementById('s').style.display="block"
+        document.getElementById('s').innerText=` You Won: ${totalscore}`
+    }
+   // nextQuestion();
+}
+
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length)
+    {
+        displayQuestion();
+        startTimer(timeLimit);
+    } else {
+        alert("Congratulations! You've completed the game.");
+        // Optionally reset the game or display final prize
+
+    }
+}
+
+// Initialize game
+// startGame();
+
+</script>
+
+</body>
+</html>
